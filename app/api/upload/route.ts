@@ -28,7 +28,7 @@ export async function POST(request: Request) {
   const ext = file.name.split(".").pop() || "jpg"
   const filename = `restaurants/${restaurantId}/${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${ext}`
 
-  const blob = await put(filename, file, { access: "public" })
+  const blob = await put(filename, file, { access: "public", token: process.env.BLOB_READ_WRITE_TOKEN })
 
   return NextResponse.json({ url: blob.url })
 }
