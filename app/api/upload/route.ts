@@ -32,7 +32,7 @@ export async function POST(request: Request) {
   const filename = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${ext}`
   const path = `restaurants/${restaurantId}/${filename}`
 
-  const bucket = adminStorage.bucket()
+  const bucket = adminStorage.bucket(process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET)
   const blob = bucket.file(path)
   await blob.save(buffer, {
     metadata: { contentType: file.type },
