@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { checkAuth } from "@/lib/auth"
-import { adminStorage } from "@/lib/firebase-admin"
+import { put } from "@vercel/blob"
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"]
 const MAX_SIZE = 5 * 1024 * 1024
@@ -25,20 +25,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Image must be under 5MB" }, { status: 400 })
   }
 
-  const bytes = await file.arrayBuffer()
-  const buffer = Buffer.from(bytes)
-
   const ext = file.name.split(".").pop() || "jpg"
-  const filename = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${ext}`
-  const path = `restaurants/${restaurantId}/${filename}`
+  const filename = `restaurants/${restaurantId}/${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${ext}`
 
-  const bucketName = process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET?.replace("firebasestorage.app", "appspot.com")
-  const bucket = adminStorage.bucket(bucketName)
-  const blob = bucket.file(path)
-  await blob.save(buffer, {
-    metadata: { contentType: file.type },
-    public: true,
-  })
+  const blob = await put(filename, file, { access: "public" })
 
-  return NextResponse.json({ url: `https://storage.googleapis.com/${bucket.name}/${path}` })
+  return NextResponse.json({ url: blob.url })
 }
