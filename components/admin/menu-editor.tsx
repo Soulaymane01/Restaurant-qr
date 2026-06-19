@@ -55,11 +55,11 @@ export function MenuEditor({ restaurantId }: Props) {
       formData.append("file", file)
       formData.append("restaurantId", restaurantId)
       const res = await fetch("/api/upload", { method: "POST", body: formData })
-      if (!res.ok) throw new Error("Upload failed")
+      if (!res.ok) { const err = await res.json(); throw new Error(err.details || "Upload failed") }
       const data = await res.json()
       setItemForm({ ...itemForm, imageUrl: data.url })
       toast.success("Image uploaded")
-    } catch { toast.error("Failed to upload image") } finally { setUploading(false) }
+    } catch (e: any) { toast.error(e.message) } finally { setUploading(false) }
   }
 
   const createCategory = async () => {
