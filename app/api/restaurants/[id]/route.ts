@@ -1,146 +1,62 @@
 import { NextResponse } from "next/server"
-import { doc, getDoc, updateDoc, deleteDoc } from "firebase/firestore"
-import { getFirebaseApp } from "@/lib/firebase"
-import { getFirestore } from "firebase/firestore"
-import { getAuth } from "firebase/auth"
-import type { Restaurant } from "@/lib/types"
+import { checkAuth } from "@/lib/auth"
+import { adminDb } from "@/lib/firebase-admin"
+import { rm } from "fs/promises"
+import path from "path"
 
-// Helper to get Firestore instance (server-side)
-const getDb = () => {
-  const app = getFirebaseApp()
-  if (!app) {
-    throw new Error("Firebase app not initialized")
-  }
-  return getFirestore(app)
+export async function GET(
+  _request: Request,
+  { params }: { params: { id: string } }
+) {
+  const user = await checkAuth()
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+
+  const { id } = params
+  const doc = await adminDb.collection("restaurants").doc(id).get()
+  if (!doc.exists) return NextResponse.json({ error: "Not found" }, { status: 404 })
+
+  return NextResponse.json({ id: doc.id, ...doc.data() })
 }
 
-// Helper to get Auth instance (server-side)
-const getFirebaseAuth = () => {
-  const app = getFirebaseApp()
-  if (!app) {
-    throw new Error("Firebase app not initialized")
-  }
-  return getAuth(app)
+export async function PUT(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  const user = await checkAuth()
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+
+  const { id } = params
+  const body = await request.json()
+
+  await adminDb.collection("restaurants").doc(id).update({ ...body, updatedAt: new Date() })
+  const doc = await adminDb.collection("restaurants").doc(id).get()
+  return NextResponse.json({ id: doc.id, ...doc.data() })
 }
 
-// Middleware for authentication and authorization (simplified for API routes)
-import admin from "firebase-admin"
+export async function DELETE(
+  _request: Request,
+  { params }: { params: { id: string } }
+) {
+  const user = await checkAuth()
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-if (!admin.apps.length) {
-  admin.initializeApp({
-    credential: admin.credential.cert({
-      projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-      clientEmail: process.env.FIREBASE_ADMIN_CLIENT_EMAIL,
-      privateKey: process.env.FIREBASE_ADMIN_PRIVATE_KEY?.replace(/\\n/g, "\n"),
-    }),
-  })
-}
+  const { id } = params
 
-// Middleware for authentication and authorization
-async function authenticateAndAuthorize(request: Request, allowedRoles: string[]) {
-  const db = getDb()
-  const idToken = request.headers.get("Authorization")?.split("Bearer ")[1]
+  const [catSnapshot, itemSnapshot, qrSnapshot] = await Promise.all([
+    adminDb.collection("categories").where("restaurantId", "==", id).get(),
+    adminDb.collection("menuItems").where("restaurantId", "==", id).get(),
+    adminDb.collection("qrCodes").where("restaurantId", "==", id).get(),
+  ])
 
-  if (!idToken) {
-    return { error: "Unauthorized", status: 401 }
-  }
+  const batch = adminDb.batch()
+  catSnapshot.docs.forEach((d) => batch.delete(d.ref))
+  itemSnapshot.docs.forEach((d) => batch.delete(d.ref))
+  qrSnapshot.docs.forEach((d) => batch.delete(d.ref))
+  batch.delete(adminDb.collection("restaurants").doc(id))
+  await batch.commit()
 
-  try {
-    const decodedToken = await admin.auth().verifyIdToken(idToken)
-    const uid = decodedToken.uid
+  const uploadDir = path.join(process.cwd(), "public", "uploads", id)
+  try { await rm(uploadDir, { recursive: true, force: true }) } catch {}
 
-    const userDoc = await getDoc(doc(db, "users", uid))
-    if (!userDoc.exists()) {
-      return { error: "User not found", status: 404 }
-    }
-
-    const userData = userDoc.data() as { role: string; approved: boolean; restaurantId?: string }
-
-    if (!userData.approved) {
-      return { error: "Account not approved", status: 403 }
-    }
-
-    if (!allowedRoles.includes(userData.role)) {
-      return { error: "Forbidden: Insufficient role", status: 403 }
-    }
-
-    return { uid, role: userData.role, restaurantId: userData.restaurantId }
-  } catch (error) {
-    console.error("Authentication/Authorization error:", error)
-    return { error: "Invalid token or authentication failed", status: 401 }
-  }
-}
-
-export async function GET(request: Request, { params }: { params: { id: string } }) {
-  const db = getDb()
-  const id = params.id
-
-  if (!id) {
-    return NextResponse.json({ error: "Restaurant ID is required" }, { status: 400 })
-  }
-
-  try {
-    const docRef = doc(db, "restaurants", id)
-    const docSnap = await getDoc(docRef)
-
-    if (!docSnap.exists()) {
-      return NextResponse.json({ error: "Restaurant not found" }, { status: 404 })
-    }
-
-    return NextResponse.json({ id: docSnap.id, ...docSnap.data() })
-  } catch (error) {
-    console.error("Error fetching restaurant:", error)
-    return NextResponse.json({ error: "Failed to fetch restaurant" }, { status: 500 })
-  }
-}
-
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
-  const authResult = await authenticateAndAuthorize(request, ["admin", "restaurant"])
-  if (authResult.error) {
-    return NextResponse.json({ error: authResult.error }, { status: authResult.status })
-  }
-
-  const db = getDb()
-  const id = params.id
-  const data: Partial<Restaurant> = await request.json()
-
-  if (!id) {
-    return NextResponse.json({ error: "Restaurant ID is required" }, { status: 400 })
-  }
-
-  // Ensure user can only update their own restaurant
-  if (authResult.role === "restaurant" && authResult.restaurantId !== id) {
-    return NextResponse.json({ error: "Forbidden: Cannot update another restaurant" }, { status: 403 })
-  }
-
-  try {
-    const restaurantRef = doc(db, "restaurants", id)
-    await updateDoc(restaurantRef, { ...data, updatedAt: new Date() })
-    return NextResponse.json({ message: "Restaurant updated successfully" })
-  } catch (error) {
-    console.error("Error updating restaurant:", error)
-    return NextResponse.json({ error: "Failed to update restaurant" }, { status: 500 })
-  }
-}
-
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
-  const authResult = await authenticateAndAuthorize(request, ["admin"]) // Only admin can delete restaurants
-  if (authResult.error) {
-    return NextResponse.json({ error: authResult.error }, { status: authResult.status })
-  }
-
-  const db = getDb()
-  const id = params.id
-
-  if (!id) {
-    return NextResponse.json({ error: "Restaurant ID is required" }, { status: 400 })
-  }
-
-  try {
-    await deleteDoc(doc(db, "restaurants", id))
-    return NextResponse.json({ message: "Restaurant deleted successfully" })
-  } catch (error) {
-    console.error("Error deleting restaurant:", error)
-    return NextResponse.json({ error: "Failed to delete restaurant" }, { status: 500 })
-  }
+  return NextResponse.json({ success: true })
 }

@@ -1,98 +1,81 @@
-import {
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  signOut as firebaseSignOut,
-  type Auth,
-} from "firebase/auth"
-import { doc, setDoc, getDoc, collection, query, where, getDocs, type Firestore } from "firebase/firestore"
-import type { User } from "./types"
+import { SignJWT, jwtVerify } from "jose"
+import { cookies } from "next/headers"
+import bcrypt from "bcryptjs"
+import { adminDb } from "./firebase-admin"
 
-export const signUp = async (
-  auth: Auth,
-  db: Firestore,
-  email: string,
-  password: string,
-  name: string,
-  role: User["role"] = "restaurant",
-) => {
-  try {
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password)
-    const firebaseUser = userCredential.user
+const secret = new TextEncoder().encode(process.env.JWT_SECRET || "dev-jwt-secret-change-in-production")
 
-    const userData: Omit<User, "id"> = {
-      email: firebaseUser.email!,
-      name,
-      role,
-      approved: false,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    }
-
-    await setDoc(doc(db, "users", firebaseUser.uid), userData)
-
-    return { user: firebaseUser, userData }
-  } catch (error) {
-    console.error("Sign up error:", error)
-    throw error
-  }
+export interface SessionUser {
+  userId: string
+  email: string
+  type: "user" | "superadmin"
 }
 
-export const signIn = async (auth: Auth, db: Firestore, email: string, password: string) => {
-  try {
-    const userCredential = await signInWithEmailAndPassword(auth, email, password)
-    const firebaseUser = userCredential.user
+export async function createSession(user: SessionUser) {
+  const token = await new SignJWT({ ...user })
+    .setProtectedHeader({ alg: "HS256" })
+    .setExpirationTime("7d")
+    .sign(secret)
 
-    const userDoc = await getDoc(doc(db, "users", firebaseUser.uid))
-    if (!userDoc.exists()) {
-      throw new Error("User data not found")
-    }
-
-    const userData = userDoc.data() as User
-    if (!userData.approved) {
-      await firebaseSignOut(auth)
-      throw new Error("Your account is pending approval. Please contact an administrator.")
-    }
-
-    return { user: firebaseUser, userData }
-  } catch (error) {
-    console.error("Sign in error:", error)
-    throw error
-  }
+  const cookieStore = cookies()
+  cookieStore.set("session", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 60 * 60 * 24 * 7,
+    path: "/",
+  })
 }
 
-export const signOut = async (auth: Auth) => {
-  try {
-    await firebaseSignOut(auth)
-  } catch (error) {
-    console.error("Sign out error:", error)
-    throw error
-  }
-}
+export async function getSession(): Promise<SessionUser | null> {
+  const cookieStore = cookies()
+  const sessionCookie = cookieStore.get("session")
+  if (!sessionCookie) return null
 
-export const getUserData = async (uid: string, db: Firestore): Promise<User | null> => {
   try {
-    const userDoc = await getDoc(doc(db, "users", uid))
-    if (userDoc.exists()) {
-      return { id: userDoc.id, ...userDoc.data() } as User
-    }
-    return null
-  } catch (error) {
-    console.error("Error fetching user data:", error)
+    const { payload } = await jwtVerify(sessionCookie.value, secret)
+    return payload as unknown as SessionUser
+  } catch {
     return null
   }
 }
 
-export const checkUserRole = (user: User, allowedRoles: User["role"][]): boolean => {
-  return allowedRoles.includes(user.role)
+export async function clearSession() {
+  const cookieStore = cookies()
+  cookieStore.delete("session")
 }
 
-export const getUsersByRestaurant = async (restaurantId: string, db: Firestore): Promise<User[]> => {
-  try {
-    const q = query(collection(db, "users"), where("restaurantId", "==", restaurantId))
-    const querySnapshot = await getDocs(q)
-    return querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as User)
-  } catch (error) {
-    console.error("Error fetching restaurant users:", error)
-    return []
-  }
+export async function checkAuth(): Promise<SessionUser | null> {
+  return getSession()
+}
+
+export async function hashPassword(password: string): Promise<string> {
+  return bcrypt.hash(password, 10)
+}
+
+export async function verifyPassword(password: string, hash: string): Promise<boolean> {
+  return bcrypt.compare(password, hash)
+}
+
+export async function getUserByEmail(email: string) {
+  const snapshot = await adminDb
+    .collection("users")
+    .where("email", "==", email.toLowerCase().trim())
+    .limit(1)
+    .get()
+
+  if (snapshot.empty) return null
+
+  const doc = snapshot.docs[0]
+  return { id: doc.id, ...doc.data() }
+}
+
+export async function createUser(email: string, password: string) {
+  const hashed = await hashPassword(password)
+  const doc = await adminDb.collection("users").add({
+    email: email.toLowerCase().trim(),
+    password: hashed,
+    createdAt: new Date(),
+  })
+  return doc.id
 }

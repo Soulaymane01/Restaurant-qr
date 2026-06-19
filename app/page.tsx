@@ -1,45 +1,20 @@
-"use client"
+import Link from "next/link"
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import { useAuth } from "@/components/providers/auth-provider"
-import { FirebaseStatus } from "@/components/firebase-status"
-import { useFirebase } from "@/components/providers/firebase-provider"
-import { Loader2 } from "lucide-react"
-
-export default function HomePage() {
-  const { user, loading } = useAuth()
-  const { initialized, error } = useFirebase()
-  const router = useRouter()
-  const [redirecting, setRedirecting] = useState(false)
-
-  useEffect(() => {
-    if (initialized && !loading && !error) {
-      setRedirecting(true)
-      if (user) {
-        router.push("/dashboard")
-      } else {
-        router.push("/auth/login")
-      }
-    }
-  }, [user, loading, initialized, error, router])
-
-  // Show Firebase status if not initialized or has error
-  if (!initialized || error) {
-    return <FirebaseStatus />
-  }
-
-  // Show loading while redirecting
-  if (redirecting || loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
-          <p className="text-sm text-gray-600">Loading...</p>
-        </div>
+export default function Home() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100">
+      <div className="text-center max-w-md px-4">
+        <h1 className="text-4xl font-bold mb-3">RestaurantQR</h1>
+        <p className="text-muted-foreground mb-6">
+          Digital menu QR code system for restaurants
+        </p>
+        <Link
+          href="/login"
+          className="inline-flex items-center px-6 py-3 rounded-xl bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors"
+        >
+          Sign In
+        </Link>
       </div>
-    )
-  }
-
-  return null
+    </div>
+  )
 }

@@ -1,123 +1,15 @@
 import { NextResponse } from "next/server"
-import { doc, getDoc, deleteDoc } from "firebase/firestore"
-import { getFirebaseApp } from "@/lib/firebase"
-import { getFirestore } from "firebase/firestore"
-import { getAuth } from "firebase/auth"
+import { checkAuth } from "@/lib/auth"
+import { adminDb } from "@/lib/firebase-admin"
 
-// Helper to get Firestore instance (server-side)
-const getDb = () => {
-  const app = getFirebaseApp()
-  if (!app) {
-    throw new Error("Firebase app not initialized")
-  }
-  return getFirestore(app)
-}
+export async function DELETE(
+  _request: Request,
+  { params }: { params: { id: string } }
+) {
+  const user = await checkAuth()
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-// Helper to get Auth instance (server-side)
-const getFirebaseAuth = () => {
-  const app = getFirebaseApp()
-  if (!app) {
-    throw new Error("Firebase app not initialized")
-  }
-  return getAuth(app)
-}
-
-// Middleware for authentication and authorization (simplified for API routes)
-import admin from "firebase-admin"
-
-if (!admin.apps.length) {
-  admin.initializeApp({
-    credential: admin.credential.cert({
-      projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-      clientEmail: process.env.FIREBASE_ADMIN_CLIENT_EMAIL,
-      privateKey: process.env.FIREBASE_ADMIN_PRIVATE_KEY?.replace(/\\n/g, "\n"),
-    }),
-  })
-}
-
-// Middleware for authentication and authorization
-async function authenticateAndAuthorize(request: Request, allowedRoles: string[]) {
-  const db = getDb()
-  const idToken = request.headers.get("Authorization")?.split("Bearer ")[1]
-
-  if (!idToken) {
-    return { error: "Unauthorized", status: 401 }
-  }
-
-  try {
-    const decodedToken = await admin.auth().verifyIdToken(idToken)
-    const uid = decodedToken.uid
-
-    const userDoc = await getDoc(doc(db, "users", uid))
-    if (!userDoc.exists()) {
-      return { error: "User not found", status: 404 }
-    }
-
-    const userData = userDoc.data() as { role: string; approved: boolean; restaurantId?: string }
-
-    if (!userData.approved) {
-      return { error: "Account not approved", status: 403 }
-    }
-
-    if (!allowedRoles.includes(userData.role)) {
-      return { error: "Forbidden: Insufficient role", status: 403 }
-    }
-
-    return { uid, role: userData.role, restaurantId: userData.restaurantId }
-  } catch (error) {
-    console.error("Authentication/Authorization error:", error)
-    return { error: "Invalid token or authentication failed", status: 401 }
-  }
-}
-
-export async function GET(request: Request, { params }: { params: { id: string } }) {
-  const db = getDb()
-  const id = params.id
-
-  if (!id) {
-    return NextResponse.json({ error: "QR Code ID is required" }, { status: 400 })
-  }
-
-  try {
-    const docRef = doc(db, "qrcodes", id)
-    const docSnap = await getDoc(docRef)
-
-    if (!docSnap.exists()) {
-      return NextResponse.json({ error: "QR Code not found" }, { status: 404 })
-    }
-
-    return NextResponse.json({ id: docSnap.id, ...docSnap.data() })
-  } catch (error) {
-    console.error("Error fetching QR code:", error)
-    return NextResponse.json({ error: "Failed to fetch QR code" }, { status: 500 })
-  }
-}
-
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
-  const authResult = await authenticateAndAuthorize(request, ["admin", "restaurant", "manager"])
-  if (authResult.error) {
-    return NextResponse.json({ error: authResult.error }, { status: authResult.status })
-  }
-
-  const db = getDb()
-  const id = params.id
-
-  if (!id) {
-    return NextResponse.json({ error: "QR Code ID is required" }, { status: 400 })
-  }
-
-  if (authResult.restaurantId) {
-    const qrCodeDoc = await getDoc(doc(db, "qrcodes", id))
-    if (!qrCodeDoc.exists() || qrCodeDoc.data()?.restaurantId !== authResult.restaurantId) {
-      return NextResponse.json({ error: "Forbidden: Cannot delete QR code for another restaurant" }, { status: 403 })
-    }
-  }
-
-  try {
-    await deleteDoc(doc(db, "qrcodes", id))
-    return NextResponse.json({ message: "QR Code deleted successfully" })
-  } catch (error) {
-    console.error("Error deleting QR code:", error)
-    return NextResponse.json({ error: "Failed to delete QR code" }, { status: 500 })
-  }
+  const { id } = params
+  await adminDb.collection("qrCodes").doc(id).delete()
+  return NextResponse.json({ success: true })
 }

@@ -1,22 +1,18 @@
-export interface User {
-  id: string
-  email: string
-  name: string
-  role: "admin" | "restaurant" | "manager" | "worker" | "client"
-  restaurantId?: string
-  approved: boolean
-  createdAt: Date
-  updatedAt: Date
-}
-
 export interface Restaurant {
   id: string
   name: string
+  slug: string
   description?: string
-  address: string
-  phone: string
-  email: string
-  ownerId: string
+  address?: string
+  phone?: string
+  logo?: string
+  theme: string
+  customColor?: string
+  headerStyle?: string
+  cardStyle?: string
+  fontStyle?: string
+  backgroundStyle?: string
+  imageLayout?: string
   createdAt: Date
   updatedAt: Date
 }
@@ -36,7 +32,7 @@ export interface MenuItem {
   name: string
   description: string
   price: number
-  categoryId: string
+  categoryId?: string
   restaurantId: string
   imageUrl?: string
   available: boolean
@@ -45,38 +41,10 @@ export interface MenuItem {
   updatedAt: Date
 }
 
-export interface Order {
-  id: string
-  tableNumber: number
-  restaurantId: string
-  items: OrderItem[]
-  totalAmount: number
-  status: "pending" | "preparing" | "ready" | "completed" | "cancelled"
-  customerName?: string
-  customerPhone?: string
-  notes?: string
-  createdAt: Date
-  updatedAt: Date
-}
-
-export interface OrderItem {
-  menuItemId: string
-  name: string
-  price: number
-  quantity: number
-  notes?: string
-}
-
 export interface QRCode {
   id: string
   tableNumber: number
   restaurantId: string
   qrCodeUrl: string
   createdAt: Date
-}
-
-export interface CartItem {
-  menuItem: MenuItem
-  quantity: number
-  notes?: string
 }
