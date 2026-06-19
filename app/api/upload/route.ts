@@ -32,7 +32,8 @@ export async function POST(request: Request) {
   const filename = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${ext}`
   const path = `restaurants/${restaurantId}/${filename}`
 
-  const bucket = adminStorage.bucket(process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET)
+  const bucketName = process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET?.replace("firebasestorage.app", "appspot.com")
+  const bucket = adminStorage.bucket(bucketName)
   const blob = bucket.file(path)
   await blob.save(buffer, {
     metadata: { contentType: file.type },
