@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server"
 import { checkAuth } from "@/lib/auth"
-import { writeFile, mkdir } from "fs/promises"
-import path from "path"
+import { adminStorage } from "@/lib/firebase-admin"
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"]
 const MAX_SIZE = 5 * 1024 * 1024
@@ -31,10 +30,16 @@ export async function POST(request: Request) {
 
   const ext = file.name.split(".").pop() || "jpg"
   const filename = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${ext}`
-  const dir = path.join(process.cwd(), "public", "uploads", restaurantId)
+  const path = `restaurants/${restaurantId}/${filename}`
 
-  await mkdir(dir, { recursive: true })
-  await writeFile(path.join(dir, filename), buffer)
+  const bucket = adminStorage.bucket()
+  const blob = bucket.file(path)
+  await blob.save(buffer, {
+    metadata: { contentType: file.type },
+    public: true,
+  })
 
-  return NextResponse.json({ url: `/uploads/${restaurantId}/${filename}` })
+  const publicUrl = `https://storage.googleapis.com/${bucket.name}/${path}`
+
+  return NextResponse.json({ url: publicUrl })
 }

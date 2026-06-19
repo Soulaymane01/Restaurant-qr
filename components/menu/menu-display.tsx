@@ -120,9 +120,9 @@ export function MenuDisplay({ restaurantId, tableNumber }: Props) {
             {restaurant.address && <span className="flex items-center gap-1.5"><MapPin className="h-3.5 w-3.5" />{restaurant.address}</span>}
             {restaurant.phone && <span className="flex items-center gap-1.5"><Phone className="h-3.5 w-3.5" />{restaurant.phone}</span>}
           </div>
-          <div className="mt-5 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/10">
-            <UtensilsCrossed className="h-3.5 w-3.5 text-white/60" />
-            <span className="text-xs text-white/80 font-medium">Table {tableNumber}</span>
+          <div className="mt-5 inline-flex items-center gap-2 px-4 py-1.5 rounded-full shadow-lg" style={{ backgroundColor: accent, color: "#fff" }}>
+            <UtensilsCrossed className="h-3.5 w-3.5" style={{ color: "#fff" }} />
+            <span className="text-xs font-medium">Table {tableNumber}</span>
           </div>
         </div>
       </div>
