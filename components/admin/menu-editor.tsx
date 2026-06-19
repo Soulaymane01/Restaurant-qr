@@ -157,7 +157,7 @@ export function MenuEditor({ restaurantId }: Props) {
                   <div className="space-y-2">
                     <Label>Image</Label>
                     <Input type="file" accept="image/*" onChange={(e) => { const f = e.target.files?.[0]; if (f) handleImageUpload(f) }} />
-                    {itemForm.imageUrl && <img src={itemForm.imageUrl} alt="Preview" className="h-20 w-20 object-contain rounded bg-muted" />}
+                    {itemForm.imageUrl && <img src={itemForm.imageUrl} alt="Preview" className="h-20 w-20 object-contain rounded bg-muted" onError={(e) => { (e.currentTarget as HTMLElement).style.display = "none" }} />}
                   </div>
                   <div className="flex items-center gap-2">
                     <Switch checked={itemForm.available} onCheckedChange={(v) => setItemForm({ ...itemForm, available: v })} id="available" />
@@ -178,7 +178,7 @@ export function MenuEditor({ restaurantId }: Props) {
               <TableBody>
                 {items.map((item) => (
                   <TableRow key={item.id}>
-                    <TableCell>{item.imageUrl ? <img src={item.imageUrl} alt="" className="h-10 w-10 rounded object-contain bg-muted" /> : <div className="h-10 w-10 rounded bg-muted" />}</TableCell>
+                    <TableCell>{item.imageUrl ? <img src={item.imageUrl} alt="" className="h-10 w-10 rounded object-contain bg-muted" onError={(e) => { (e.currentTarget as HTMLElement).style.display = "none" }} /> : <div className="h-10 w-10 rounded bg-muted" />}</TableCell>
                     <TableCell className="font-medium">{item.name}</TableCell>
                     <TableCell className="text-muted-foreground">{categories.find((c) => c.id === item.categoryId)?.name || "—"}</TableCell>
                     <TableCell>{item.price.toFixed(2)} MAD</TableCell>

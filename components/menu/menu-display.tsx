@@ -112,7 +112,7 @@ export function MenuDisplay({ restaurantId, tableNumber }: Props) {
         <div className={`absolute inset-0 ${theme.headerPattern} opacity-40`} />
         <div className={`relative max-w-2xl mx-auto px-4 ${header.contentPadding} text-center`}>
           {restaurant.logo && (
-            <img src={restaurant.logo} alt="" className="h-20 w-20 mx-auto mb-5 rounded-full object-cover ring-4 ring-white/20 shadow-xl" />
+            <img src={restaurant.logo} alt="" className="h-20 w-20 mx-auto mb-5 rounded-full object-cover ring-4 ring-white/20 shadow-xl" onError={(e) => { (e.currentTarget as HTMLElement).style.display = "none" }} />
           )}
           <h1 className={`text-3xl font-bold tracking-tight drop-shadow-sm ${theme.heading} ${itemNameClass}`}>{restaurant.name}</h1>
           {restaurant.description && <p className="mt-2 text-white/70 text-sm max-w-md mx-auto leading-relaxed">{restaurant.description}</p>}
@@ -165,7 +165,7 @@ export function MenuDisplay({ restaurantId, tableNumber }: Props) {
                   <div className={imgLayout.container}>
                     {item.imageUrl && imgLayout.showImage && (
                       <div className={`${imgLayout.wrapper} ${imgLayout.container === "flex flex-col" ? "min-h-[10rem]" : "min-h-[7rem]"} overflow-hidden bg-muted`}>
-                        <img src={item.imageUrl} alt={item.name} className={imgLayout.imgClasses} />
+                        <img src={item.imageUrl} alt={item.name} className={imgLayout.imgClasses} onError={(e) => { (e.currentTarget.parentElement as HTMLElement).style.display = "none" }} />
                       </div>
                     )}
                     <div className="flex-1 p-4">
