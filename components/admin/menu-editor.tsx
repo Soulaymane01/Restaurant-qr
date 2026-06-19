@@ -33,7 +33,7 @@ export function MenuEditor({ restaurantId }: Props) {
   const [deleting, setDeleting] = useState(false)
 
   const [catForm, setCatForm] = useState({ name: "", description: "" })
-  const [itemForm, setItemForm] = useState({ name: "", description: "", price: "", categoryId: "", imageUrl: "", available: true })
+  const [itemForm, setItemForm] = useState({ name: "", description: "", price: "", categoryId: "none", imageUrl: "", available: true })
 
   const fetchData = useCallback(async () => {
     try {
@@ -88,10 +88,10 @@ export function MenuEditor({ restaurantId }: Props) {
   const openItemDialog = (item?: MenuItem) => {
     if (item) {
       setEditingItem(item)
-      setItemForm({ name: item.name, description: item.description, price: item.price.toString(), categoryId: item.categoryId || "", imageUrl: item.imageUrl || "", available: item.available })
+      setItemForm({ name: item.name, description: item.description, price: item.price.toString(), categoryId: item.categoryId || "none", imageUrl: item.imageUrl || "", available: item.available })
     } else {
       setEditingItem(null)
-      setItemForm({ name: "", description: "", price: "", categoryId: "", imageUrl: "", available: true })
+      setItemForm({ name: "", description: "", price: "", categoryId: "none", imageUrl: "", available: true })
     }
     setItemDialogOpen(true)
   }
@@ -99,7 +99,7 @@ export function MenuEditor({ restaurantId }: Props) {
   const saveItem = async () => {
     if (!itemForm.name || !itemForm.price) return
     try {
-      const body = { ...itemForm, restaurantId }
+      const body = { ...itemForm, categoryId: itemForm.categoryId === "none" ? "" : itemForm.categoryId, restaurantId }
       let res
       if (editingItem) {
         res = await fetch(`/api/menu-items/${editingItem.id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) })
@@ -148,7 +148,7 @@ export function MenuEditor({ restaurantId }: Props) {
                       <Select value={itemForm.categoryId} onValueChange={(v) => setItemForm({ ...itemForm, categoryId: v })}>
                         <SelectTrigger><SelectValue /></SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">No category</SelectItem>
+                          <SelectItem value="none">No category</SelectItem>
                           {categories.map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
                         </SelectContent>
                       </Select>
