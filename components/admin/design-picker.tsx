@@ -119,7 +119,7 @@ export function DesignPicker({ restaurantId }: Props) {
             const isActive = selectedTheme === theme.id
             const ac = isActive ? accent : theme.defaultAccent
             return (
-              <Card key={theme.id} className={`relative cursor-pointer overflow-hidden transition-all ${isActive ? "ring-2 ring-primary shadow-lg scale-[1.02]" : "hover:ring-2 hover:ring-muted-foreground/30 hover:shadow-md"}`} onClick={() => setSelectedTheme(theme.id)}>
+              <Card key={theme.id} className={`relative cursor-pointer overflow-hidden transition-all ${isActive ? "ring-2 ring-primary shadow-lg scale-[1.02]" : "hover:ring-2 hover:ring-muted-foreground/30 hover:shadow-md"}`} onClick={() => { setSelectedTheme(theme.id); setSettings((prev) => ({ ...prev, ...theme.defaults, customColor: prev.customColor })) }}>
                 <div className={`h-28 ${theme.previewBg} flex flex-col items-center justify-center p-3`}>
                   <div className={`w-full rounded-t-md ${theme.previewHeader} h-3 mb-1.5`} />
                   <div className="w-3/4 h-1.5 rounded mb-1" style={{ backgroundColor: ac }} />

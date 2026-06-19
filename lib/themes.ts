@@ -3,6 +3,13 @@ export interface ThemePreset {
   name: string
   description: string
   defaultAccent: string
+  defaults: {
+    headerStyle: string
+    cardStyle: string
+    fontStyle: string
+    backgroundStyle: string
+    imageLayout: string
+  }
   previewBg: string
   previewHeader: string
   previewCard: string
@@ -29,7 +36,7 @@ export interface ThemePreset {
 export const themePresets: ThemePreset[] = [
   {
     id: "classic", name: "Classic", description: "Warm amber tones, cozy bistro feel",
-    defaultAccent: "#b45309", previewBg: "bg-gradient-to-br from-amber-50 to-amber-100",
+    defaultAccent: "#b45309", defaults: { headerStyle: "gradient", cardStyle: "accent-border", fontStyle: "default", backgroundStyle: "dots", imageLayout: "side" }, previewBg: "bg-gradient-to-br from-amber-50 to-amber-100",
     previewHeader: "bg-amber-800", previewCard: "bg-white/80", previewAccent: "bg-amber-600",
     pageBg: "bg-amber-50", pagePattern: "bg-[radial-gradient(#d4a76233_1px,transparent_1px)] bg-[length:20px_20px]",
     headerBg: "bg-gradient-to-br from-amber-800 via-amber-700 to-amber-800",
@@ -43,7 +50,7 @@ export const themePresets: ThemePreset[] = [
   },
   {
     id: "midnight", name: "Midnight", description: "Dark slate, premium steakhouse feel",
-    defaultAccent: "#3b82f6", previewBg: "bg-gradient-to-br from-slate-900 to-slate-800",
+    defaultAccent: "#3b82f6", defaults: { headerStyle: "minimal", cardStyle: "shadow", fontStyle: "default", backgroundStyle: "dots", imageLayout: "thumbnail" }, previewBg: "bg-gradient-to-br from-slate-900 to-slate-800",
     previewHeader: "bg-slate-700", previewCard: "bg-slate-800/80", previewAccent: "bg-blue-500",
     pageBg: "bg-slate-900", pagePattern: "bg-[radial-gradient(#ffffff08_1px,transparent_1px)] bg-[length:20px_20px]",
     headerBg: "bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800",
@@ -55,7 +62,7 @@ export const themePresets: ThemePreset[] = [
   },
   {
     id: "fresh", name: "Fresh", description: "Clean emerald, natural healthy vibe",
-    defaultAccent: "#047857", previewBg: "bg-gradient-to-br from-green-50 to-emerald-100",
+    defaultAccent: "#047857", defaults: { headerStyle: "gradient", cardStyle: "color-top", fontStyle: "spacious", backgroundStyle: "waves", imageLayout: "top" }, previewBg: "bg-gradient-to-br from-green-50 to-emerald-100",
     previewHeader: "bg-emerald-700", previewCard: "bg-white/80", previewAccent: "bg-emerald-600",
     pageBg: "bg-emerald-50", pagePattern: "bg-[radial-gradient(#34d39933_1px,transparent_1px)] bg-[length:20px_20px]",
     headerBg: "bg-gradient-to-br from-emerald-800 via-emerald-700 to-green-800",
@@ -69,7 +76,7 @@ export const themePresets: ThemePreset[] = [
   },
   {
     id: "rustic", name: "Rustic", description: "Warm rose, earthy farm-to-table",
-    defaultAccent: "#be123c", previewBg: "bg-gradient-to-br from-orange-50 to-rose-100",
+    defaultAccent: "#be123c", defaults: { headerStyle: "centered", cardStyle: "accent-border", fontStyle: "serif", backgroundStyle: "grid", imageLayout: "side" }, previewBg: "bg-gradient-to-br from-orange-50 to-rose-100",
     previewHeader: "bg-rose-700", previewCard: "bg-white/80", previewAccent: "bg-rose-600",
     pageBg: "bg-rose-50", pagePattern: "bg-[radial-gradient(#f43f5e33_1px,transparent_1px)] bg-[length:20px_20px]",
     headerBg: "bg-gradient-to-br from-rose-800 via-rose-700 to-orange-800",
@@ -83,7 +90,7 @@ export const themePresets: ThemePreset[] = [
   },
   {
     id: "ocean", name: "Ocean", description: "Cool teal blue, coastal seafood",
-    defaultAccent: "#0e7490", previewBg: "bg-gradient-to-br from-cyan-50 to-blue-100",
+    defaultAccent: "#0e7490", defaults: { headerStyle: "gradient", cardStyle: "minimal", fontStyle: "spacious", backgroundStyle: "waves", imageLayout: "top" }, previewBg: "bg-gradient-to-br from-cyan-50 to-blue-100",
     previewHeader: "bg-cyan-700", previewCard: "bg-white/80", previewAccent: "bg-cyan-600",
     pageBg: "bg-cyan-50", pagePattern: "bg-[radial-gradient(#22d3ee33_1px,transparent_1px)] bg-[length:20px_20px]",
     headerBg: "bg-gradient-to-br from-cyan-800 via-cyan-700 to-blue-800",
@@ -97,7 +104,7 @@ export const themePresets: ThemePreset[] = [
   },
   {
     id: "sunset", name: "Sunset", description: "Vibrant orange coral, energetic",
-    defaultAccent: "#ea580c", previewBg: "bg-gradient-to-br from-orange-50 to-red-100",
+    defaultAccent: "#ea580c", defaults: { headerStyle: "solid", cardStyle: "color-top", fontStyle: "bold", backgroundStyle: "dots", imageLayout: "side" }, previewBg: "bg-gradient-to-br from-orange-50 to-red-100",
     previewHeader: "bg-orange-700", previewCard: "bg-white/80", previewAccent: "bg-orange-600",
     pageBg: "bg-orange-50", pagePattern: "bg-[radial-gradient(#f9731633_1px,transparent_1px)] bg-[length:20px_20px]",
     headerBg: "bg-gradient-to-br from-orange-800 via-orange-700 to-red-800",
@@ -111,7 +118,7 @@ export const themePresets: ThemePreset[] = [
   },
   {
     id: "lavender", name: "Lavender", description: "Soft purple, elegant boutique",
-    defaultAccent: "#7c3aed", previewBg: "bg-gradient-to-br from-purple-50 to-violet-100",
+    defaultAccent: "#7c3aed", defaults: { headerStyle: "gradient", cardStyle: "shadow", fontStyle: "default", backgroundStyle: "dots", imageLayout: "thumbnail" }, previewBg: "bg-gradient-to-br from-purple-50 to-violet-100",
     previewHeader: "bg-purple-700", previewCard: "bg-white/80", previewAccent: "bg-purple-600",
     pageBg: "bg-purple-50", pagePattern: "bg-[radial-gradient(#a855f733_1px,transparent_1px)] bg-[length:20px_20px]",
     headerBg: "bg-gradient-to-br from-purple-800 via-purple-700 to-violet-800",
@@ -125,7 +132,7 @@ export const themePresets: ThemePreset[] = [
   },
   {
     id: "forest", name: "Forest", description: "Deep green, natural organic feel",
-    defaultAccent: "#166534", previewBg: "bg-gradient-to-br from-lime-50 to-green-100",
+    defaultAccent: "#166534", defaults: { headerStyle: "centered", cardStyle: "minimal", fontStyle: "serif", backgroundStyle: "grid", imageLayout: "side" }, previewBg: "bg-gradient-to-br from-lime-50 to-green-100",
     previewHeader: "bg-green-700", previewCard: "bg-white/80", previewAccent: "bg-green-600",
     pageBg: "bg-green-50", pagePattern: "bg-[radial-gradient(#4ade8033_1px,transparent_1px)] bg-[length:20px_20px]",
     headerBg: "bg-gradient-to-br from-green-800 via-green-700 to-lime-800",
@@ -139,7 +146,7 @@ export const themePresets: ThemePreset[] = [
   },
   {
     id: "stone", name: "Stone", description: "Neutral gray, minimalist modern",
-    defaultAccent: "#44403c", previewBg: "bg-gradient-to-br from-stone-100 to-stone-200",
+    defaultAccent: "#44403c", defaults: { headerStyle: "minimal", cardStyle: "minimal", fontStyle: "default", backgroundStyle: "none", imageLayout: "hidden" }, previewBg: "bg-gradient-to-br from-stone-100 to-stone-200",
     previewHeader: "bg-stone-700", previewCard: "bg-white/80", previewAccent: "bg-stone-600",
     pageBg: "bg-stone-100", pagePattern: "bg-[radial-gradient(#a8a29e33_1px,transparent_1px)] bg-[length:20px_20px]",
     headerBg: "bg-gradient-to-br from-stone-800 via-stone-700 to-stone-800",
@@ -153,7 +160,7 @@ export const themePresets: ThemePreset[] = [
   },
   {
     id: "ruby", name: "Ruby", description: "Bold red, passionate and striking",
-    defaultAccent: "#dc2626", previewBg: "bg-gradient-to-br from-red-50 to-rose-100",
+    defaultAccent: "#dc2626", defaults: { headerStyle: "solid", cardStyle: "color-top", fontStyle: "bold", backgroundStyle: "dots", imageLayout: "top" }, previewBg: "bg-gradient-to-br from-red-50 to-rose-100",
     previewHeader: "bg-red-700", previewCard: "bg-white/80", previewAccent: "bg-red-600",
     pageBg: "bg-red-50", pagePattern: "bg-[radial-gradient(#ef444433_1px,transparent_1px)] bg-[length:20px_20px]",
     headerBg: "bg-gradient-to-br from-red-800 via-red-700 to-rose-800",
