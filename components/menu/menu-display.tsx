@@ -156,6 +156,28 @@ export function MenuDisplay({ restaurantId, tableNumber }: Props) {
             <UtensilsCrossed className="h-12 w-12 mx-auto mb-4 opacity-30" style={{ color: accent }} />
             <p className={theme.textMuted}>No items in this category</p>
           </div>
+        ) : imgLayout.isGrid ? (
+          <div className="grid grid-cols-2 gap-4">
+            {catItems.map((item) => (
+              <div key={item.id} className={`rounded-xl overflow-hidden transition-all duration-200 shadow-sm bg-white ${!item.available ? "opacity-50" : ""}`}>
+                {item.imageUrl && (
+                  <div className="aspect-[4/3] overflow-hidden bg-muted">
+                    <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" onError={(e) => { (e.currentTarget.parentElement as HTMLElement).style.display = "none" }} />
+                  </div>
+                )}
+                <div className="p-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <h3 className={`text-sm font-semibold ${theme.itemName} ${itemNameClass}`}>{item.name}</h3>
+                    <span className="shrink-0 text-xs font-bold whitespace-nowrap" style={{ color: accent }}>
+                      {(Number(item.price) || 0).toFixed(2)} MAD
+                    </span>
+                  </div>
+                  {item.description && <p className={`text-xs mt-1 ${theme.text} opacity-60 leading-relaxed line-clamp-2`}>{item.description}</p>}
+                  {!item.available && <Badge variant="secondary" className="mt-1.5 text-[10px]">Unavailable</Badge>}
+                </div>
+              </div>
+            ))}
+          </div>
         ) : (
           <div className="space-y-4">
             {catItems.map((item, idx) => (

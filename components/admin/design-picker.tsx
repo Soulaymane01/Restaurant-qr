@@ -49,6 +49,7 @@ function GroupPreview({ groupId, optionId, accent }: { groupId: string; optionId
   }
   if (groupId === "imageLayout") {
     if (optionId === "top") return <div className="w-full h-full rounded-lg bg-white border border-gray-100 flex flex-col overflow-hidden"><div className="h-5 bg-gray-100" /><div className="flex-1 flex items-center justify-center px-2"><div className="w-3/4 h-1.5 rounded bg-gray-200" /></div></div>
+    if (optionId === "grid") return <div className="w-full h-full rounded-lg bg-white border border-gray-100 p-1.5"><div className="grid grid-cols-2 gap-1"><div className="aspect-[4/3] rounded bg-gray-100" /><div className="aspect-[4/3] rounded bg-gray-100" /><div className="aspect-[4/3] rounded bg-gray-100" /><div className="aspect-[4/3] rounded bg-gray-100" /></div></div>
     if (optionId === "thumbnail") return <div className="w-full h-full rounded-lg bg-white border border-gray-100 flex items-center gap-1.5 px-2"><div className="w-5 h-5 rounded bg-gray-100 shrink-0" /><div className="flex-1 h-1.5 rounded bg-gray-200" /></div>
     if (optionId === "hidden") return <div className="w-full h-full rounded-lg bg-gray-50 flex items-center justify-center"><div className="w-3/4 h-1.5 rounded bg-gray-200" /></div>
     return <div className="w-full h-full rounded-lg bg-white border border-gray-100 flex items-center overflow-hidden"><div className="w-10 h-full bg-gray-100 shrink-0" /><div className="flex-1 px-2"><div className="w-full h-1.5 rounded bg-gray-200" /></div></div>

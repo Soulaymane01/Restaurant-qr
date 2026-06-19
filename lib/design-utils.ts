@@ -68,17 +68,20 @@ export function getImageLayout(layout: string | undefined | null): {
   wrapper: string
   imgClasses: string
   showImage: boolean
+  isGrid: boolean
 } {
   switch (layout) {
     case "top":
-      return { container: "flex flex-col", wrapper: "w-full", imgClasses: "w-full h-40 object-cover", showImage: true }
+      return { container: "flex flex-col", wrapper: "w-full", imgClasses: "w-full h-40 object-cover", showImage: true, isGrid: false }
+    case "grid":
+      return { container: "", wrapper: "", imgClasses: "w-full h-full object-cover", showImage: true, isGrid: true }
     case "thumbnail":
-      return { container: "flex items-start", wrapper: "w-16 shrink-0", imgClasses: "w-16 h-16 object-cover rounded-md", showImage: true }
+      return { container: "flex items-start", wrapper: "w-16 shrink-0", imgClasses: "w-16 h-16 object-cover rounded-md", showImage: true, isGrid: false }
     case "hidden":
-      return { container: "flex", wrapper: "", imgClasses: "", showImage: false }
+      return { container: "flex", wrapper: "", imgClasses: "", showImage: false, isGrid: false }
     case "side":
     default:
-      return { container: "flex", wrapper: "w-28 shrink-0", imgClasses: "w-full h-28 object-cover rounded-l-xl", showImage: true }
+      return { container: "flex", wrapper: "w-28 shrink-0", imgClasses: "w-full h-28 object-cover rounded-l-xl", showImage: true, isGrid: false }
   }
 }
 

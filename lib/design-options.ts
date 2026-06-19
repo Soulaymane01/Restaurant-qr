@@ -66,6 +66,7 @@ export const imageLayoutOptions: OptionGroup<string> = {
   options: [
     { id: "side", name: "Side", description: "Image on the left side" },
     { id: "top", name: "Top", description: "Image on top of the card" },
+    { id: "grid", name: "Grid", description: "Grid of image cards" },
     { id: "thumbnail", name: "Thumbnail", description: "Small thumbnail" },
     { id: "hidden", name: "Hidden", description: "Hide images" },
   ],
@@ -85,7 +86,7 @@ export const defaultDesign: DesignSettings = {
   cardStyle: "accent-border",
   fontStyle: "default",
   backgroundStyle: "dots",
-  imageLayout: "side",
+  imageLayout: "grid",
   customColor: "",
 }
 

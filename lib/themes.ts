@@ -62,7 +62,7 @@ export const themePresets: ThemePreset[] = [
   },
   {
     id: "fresh", name: "Fresh", description: "Clean emerald, natural healthy vibe",
-    defaultAccent: "#047857", defaults: { headerStyle: "gradient", cardStyle: "color-top", fontStyle: "spacious", backgroundStyle: "waves", imageLayout: "top" }, previewBg: "bg-gradient-to-br from-green-50 to-emerald-100",
+    defaultAccent: "#047857", defaults: { headerStyle: "gradient", cardStyle: "color-top", fontStyle: "spacious", backgroundStyle: "waves", imageLayout: "grid" }, previewBg: "bg-gradient-to-br from-green-50 to-emerald-100",
     previewHeader: "bg-emerald-700", previewCard: "bg-white/80", previewAccent: "bg-emerald-600",
     pageBg: "bg-emerald-50", pagePattern: "bg-[radial-gradient(#34d39933_1px,transparent_1px)] bg-[length:20px_20px]",
     headerBg: "bg-gradient-to-br from-emerald-800 via-emerald-700 to-green-800",
@@ -90,7 +90,7 @@ export const themePresets: ThemePreset[] = [
   },
   {
     id: "ocean", name: "Ocean", description: "Cool teal blue, coastal seafood",
-    defaultAccent: "#0e7490", defaults: { headerStyle: "gradient", cardStyle: "minimal", fontStyle: "spacious", backgroundStyle: "waves", imageLayout: "top" }, previewBg: "bg-gradient-to-br from-cyan-50 to-blue-100",
+    defaultAccent: "#0e7490", defaults: { headerStyle: "gradient", cardStyle: "minimal", fontStyle: "spacious", backgroundStyle: "waves", imageLayout: "grid" }, previewBg: "bg-gradient-to-br from-cyan-50 to-blue-100",
     previewHeader: "bg-cyan-700", previewCard: "bg-white/80", previewAccent: "bg-cyan-600",
     pageBg: "bg-cyan-50", pagePattern: "bg-[radial-gradient(#22d3ee33_1px,transparent_1px)] bg-[length:20px_20px]",
     headerBg: "bg-gradient-to-br from-cyan-800 via-cyan-700 to-blue-800",
