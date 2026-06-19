@@ -11,7 +11,13 @@ export async function PUT(
 
   const { id } = params
   const body = await request.json()
-  await adminDb.collection("menuItems").doc(id).update({ ...body, updatedAt: new Date() })
+  
+  const updateData: any = { ...body, updatedAt: new Date() }
+  if (body.price !== undefined) {
+    updateData.price = parseFloat(body.price) || 0
+  }
+
+  await adminDb.collection("menuItems").doc(id).update(updateData)
   return NextResponse.json({ success: true })
 }
 

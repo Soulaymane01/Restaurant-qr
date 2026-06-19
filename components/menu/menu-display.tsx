@@ -164,7 +164,7 @@ export function MenuDisplay({ restaurantId, tableNumber }: Props) {
                   style={card.borderSide !== "none" ? { [card.borderSide === "left" ? "borderLeft" : "borderTop"]: `4px solid ${accent}` } : undefined}>
                   <div className={imgLayout.container}>
                     {item.imageUrl && imgLayout.showImage && (
-                      <div className={`${imgLayout.wrapper} ${imgLayout.container === "flex flex-col" ? "min-h-[10rem]" : "min-h-[7rem]"} overflow-hidden bg-muted`}>
+                      <div className={`${imgLayout.wrapper} ${imgLayout.container === "flex flex-col" ? "h-40" : "h-28"} overflow-hidden bg-muted`}>
                         <img src={item.imageUrl} alt={item.name} className={imgLayout.imgClasses} onError={(e) => { (e.currentTarget.parentElement as HTMLElement).style.display = "none" }} />
                       </div>
                     )}
@@ -172,7 +172,7 @@ export function MenuDisplay({ restaurantId, tableNumber }: Props) {
                       <div className="flex items-start justify-between gap-3">
                         <h3 className={`font-semibold ${theme.itemName} ${itemNameClass}`}>{item.name}</h3>
                         <span className="shrink-0 inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-bold text-white" style={{ backgroundColor: accent }}>
-                          {item.price.toFixed(2)} MAD
+                          {(Number(item.price) || 0).toFixed(2)} MAD
                         </span>
                       </div>
                       {item.description && <p className={`text-sm mt-1.5 ${theme.text} opacity-65 leading-relaxed`}>{item.description}</p>}
